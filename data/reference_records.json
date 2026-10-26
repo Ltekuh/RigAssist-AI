@@ -1,0 +1,183 @@
+{
+  "schemaVersion": "1.0",
+  "datasetVersion": "0.1.0-draft",
+  "disclaimer": "RigAssist AI is a prototype. Reference information is a summary for learning and planning support only. Always verify against the original source, the equipment's rated capacity tag, and site requirements, and have a qualified person approve every lift.",
+  "records": [
+    {
+      "id": "REF-001",
+      "topic": "Sling angle and tension",
+      "category": "load_angle",
+      "tags": ["sling angle", "load angle", "leg tension", "angle factor"],
+      "summary": "As the angle between a sling leg and the horizontal gets smaller, the tension in each leg gets larger, even though the load weight stays the same. Tension per leg equals the load share carried by that leg divided by the sine of the angle measured from horizontal.",
+      "aiContext": "Sling leg tension increases as the sling angle measured from horizontal decreases. Tension in a leg equals the load carried by that leg divided by the sine of the angle from horizontal. The load weight does not change; the force in each leg does.",
+      "relatedCalculation": "loadAngleMultiplier",
+      "source": {
+        "title": "Slings (ASME B30.9)",
+        "publisher": "American Society of Mechanical Engineers (ASME)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-002",
+      "topic": "Load angle multiplier values",
+      "category": "load_angle",
+      "tags": ["load angle multiplier", "angle factor", "60 degrees", "45 degrees", "30 degrees"],
+      "summary": "The multiplier is 1 divided by the sine of the angle from horizontal. At 90 degrees it is 1.0, at 60 degrees about 1.155, at 45 degrees about 1.414, and at 30 degrees exactly 2.0. Multiply the share of the load on a leg by this value to find the tension in that leg.",
+      "aiContext": "Load angle multiplier equals 1 divided by sin(angle from horizontal). Reference values: 90 degrees is 1.0, 60 degrees is about 1.155, 45 degrees is about 1.414, 30 degrees is 2.0. The application's deterministic calculator is the only authority for calculated results.",
+      "relatedCalculation": "loadAngleMultiplier",
+      "source": {
+        "title": "Slings (ASME B30.9)",
+        "publisher": "American Society of Mechanical Engineers (ASME)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-003",
+      "topic": "Low sling angles",
+      "category": "load_angle",
+      "tags": ["low angle", "minimum angle", "sling angle", "30 degrees"],
+      "summary": "Low sling angles sharply increase leg tension and can overload the sling or the attachment points. Many rigging references advise against angles below 30 degrees from horizontal. Check the limit that applies to your equipment, employer, and site.",
+      "aiContext": "Low sling angles greatly increase leg tension. Many rigging references advise against sling angles below 30 degrees from horizontal. The applicable limit depends on the equipment manufacturer, employer, and site rules, which must be confirmed by a qualified person.",
+      "relatedCalculation": "loadAngleMultiplier",
+      "source": {
+        "title": "Slings (ASME B30.9)",
+        "publisher": "American Society of Mechanical Engineers (ASME)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-004",
+      "topic": "Vertical hitch",
+      "category": "sling_configuration",
+      "tags": ["vertical hitch", "straight pull", "sling configuration"],
+      "summary": "In a vertical hitch the sling hangs straight from the hook to the load and the pull is in line with the sling. The sling's rated capacity for a vertical hitch is the value shown on its capacity tag.",
+      "aiContext": "A vertical hitch has the sling pulled in a straight line between hook and load. The rated capacity for a vertical hitch is the value on the sling's rated capacity tag or manufacturer table.",
+      "relatedCalculation": null,
+      "source": {
+        "title": "Slings (ASME B30.9)",
+        "publisher": "American Society of Mechanical Engineers (ASME)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-005",
+      "topic": "Choker hitch",
+      "category": "sling_configuration",
+      "tags": ["choker hitch", "choke", "sling configuration", "reduced capacity"],
+      "summary": "A choker hitch wraps the sling around the load and back through its own eye or fitting. Its rated capacity is lower than a vertical hitch and depends on sling type and the angle of the choke. Use the manufacturer's rating for the exact hitch and angle.",
+      "aiContext": "A choker hitch has a lower rated capacity than a vertical hitch. The reduction depends on the sling type and the choke angle. The manufacturer's rating for the specific hitch must be used; do not estimate it.",
+      "relatedCalculation": null,
+      "source": {
+        "title": "Slings (ASME B30.9)",
+        "publisher": "American Society of Mechanical Engineers (ASME)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-006",
+      "topic": "Basket hitch",
+      "category": "sling_configuration",
+      "tags": ["basket hitch", "sling configuration", "d/d ratio", "bend radius"],
+      "summary": "In a basket hitch the sling passes under the load with both ends on the hook or lifting device. Capacity depends on the angle of the legs and on how sharply the sling bends around the load. Use the manufacturer's rating for the exact angle and bend diameter.",
+      "aiContext": "A basket hitch passes the sling under the load with both ends attached above. Its capacity depends on the leg angle and the bend diameter relative to the sling diameter. The manufacturer's rating for the specific conditions must be used.",
+      "relatedCalculation": "loadAngleMultiplier",
+      "source": {
+        "title": "Slings (ASME B30.9)",
+        "publisher": "American Society of Mechanical Engineers (ASME)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-007",
+      "topic": "Multi-leg bridle slings",
+      "category": "sling_configuration",
+      "tags": ["bridle sling", "multi-leg", "load sharing", "sling configuration"],
+      "summary": "A bridle uses two or more legs from one hook to separate lifting points. Legs at different angles carry different shares of the load. With rigid loads, do not assume more than two legs carry the weight unless a qualified person confirms how the load is shared.",
+      "aiContext": "A bridle sling uses multiple legs from one hook. Legs at unequal angles carry unequal loads. For rigid loads, do not assume more than two legs share the weight unless a qualified person has confirmed the load distribution.",
+      "relatedCalculation": "loadAngleMultiplier",
+      "source": {
+        "title": "Slings (ASME B30.9)",
+        "publisher": "American Society of Mechanical Engineers (ASME)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-008",
+      "topic": "Rated capacity and working load limit",
+      "category": "capacity",
+      "tags": ["rated capacity", "working load limit", "wll", "capacity tag"],
+      "summary": "Every sling and piece of rigging hardware has a rated capacity set by its manufacturer. It must never be exceeded. Read the identification tag or manufacturer table for the exact hitch and conditions, and account for the increased tension caused by sling angle.",
+      "aiContext": "Rigging equipment has a manufacturer rated capacity (working load limit) that must not be exceeded. The identification tag or manufacturer table gives the value for the specific hitch and conditions. Sling angle increases leg tension and must be accounted for.",
+      "relatedCalculation": "loadAngleMultiplier",
+      "source": {
+        "title": "Rigging Equipment for Material Handling, 29 CFR 1926.251",
+        "publisher": "U.S. Occupational Safety and Health Administration (OSHA)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-009",
+      "topic": "Sling inspection before use",
+      "category": "inspection",
+      "tags": ["inspection", "damaged sling", "remove from service", "pre-use check"],
+      "summary": "Inspect slings and rigging hardware before use. Damaged or defective equipment must be removed from service. The specific defects to look for depend on the sling type, so follow the inspection criteria in the applicable standard and manufacturer instructions.",
+      "aiContext": "Slings and rigging hardware must be inspected before use and damaged or defective items removed from service. Inspection criteria depend on sling type and are set by the applicable standard and the manufacturer.",
+      "relatedCalculation": null,
+      "source": {
+        "title": "Rigging Equipment for Material Handling, 29 CFR 1926.251",
+        "publisher": "U.S. Occupational Safety and Health Administration (OSHA)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-010",
+      "topic": "Center of gravity and hook position",
+      "category": "lift_planning",
+      "tags": ["center of gravity", "hook position", "lift planning", "load stability"],
+      "summary": "For a stable lift the hook should sit directly above the load's center of gravity. If it does not, the load will tilt or shift when lifted, changing how much each sling leg carries. Confirm the center of gravity before lifting.",
+      "aiContext": "A stable lift requires the hook to be above the load's center of gravity. Otherwise the load tilts or shifts and the share of weight on each sling leg changes. The center of gravity should be confirmed before the lift.",
+      "relatedCalculation": null,
+      "source": {
+        "title": "Rigging Equipment for Material Handling, 29 CFR 1926.251",
+        "publisher": "U.S. Occupational Safety and Health Administration (OSHA)",
+        "edition": "TO VERIFY",
+        "section": "TO VERIFY"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    },
+    {
+      "id": "REF-011",
+      "topic": "Prototype limits and human verification",
+      "category": "app_scope",
+      "tags": ["prototype", "limitations", "human verification", "qualified person"],
+      "summary": "RigAssist AI is a prototype and does not replace a qualified rigger or a lift plan. Calculator results and reference information must be checked by a qualified person before any lift.",
+      "aiContext": "RigAssist AI is a prototype. It does not replace a qualified person or an approved lift plan. All calculator results and reference information require human verification before any lift. The AI does not perform or override calculations.",
+      "relatedCalculation": null,
+      "source": {
+        "title": "RigAssist AI Project Scope (RA-101)",
+        "publisher": "RigAssist AI Group 3",
+        "edition": "Week 1 draft",
+        "section": "AI boundaries"
+      },
+      "verification": { "status": "unverified", "reviewedBy": null, "reviewedOn": null }
+    }
+  ]
+}
