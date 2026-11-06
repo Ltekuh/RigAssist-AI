@@ -18,6 +18,25 @@ struct CalculatorView: View {
 
     @State private var validationMessage: String?
 
+    // MARK: - Calculation State
+
+    /// Temporary engine used while the production deterministic
+    /// Calculation Engine is being implemented.
+    ///
+    /// The UI communicates through CalculationEngineProtocol so the
+    /// production engine can replace the mock without redesigning the view.
+    private let calculationEngine: any CalculationEngineProtocol =
+        MockCalculationEngine()
+
+    /// Stores the validated input used for the completed calculation.
+    @State private var completedInput: LiftInput?
+
+    /// Stores the result returned by the Calculation Engine.
+    @State private var completedResult: CalculationResult?
+
+    /// Controls navigation to the calculation results screen.
+    @State private var showResults = false
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -41,14 +60,19 @@ struct CalculatorView: View {
                                 fieldLabel("Load Weight")
 
                                 HStack {
-                                    TextField("Enter weight", text: $loadWeight)
-                                        .keyboardType(.numberPad)
-                                        .onChange(of: loadWeight) { _, newValue in
-                                            loadWeight = formatWholeNumber(newValue)
-                                        }
+                                    TextField(
+                                        "Enter weight",
+                                        text: $loadWeight
+                                    )
+                                    .keyboardType(.numberPad)
+                                    .onChange(of: loadWeight) { _, newValue in
+                                        loadWeight = formatWholeNumber(newValue)
+                                    }
 
                                     Text("lb")
-                                        .foregroundStyle(RigAssistTheme.secondaryText)
+                                        .foregroundStyle(
+                                            RigAssistTheme.secondaryText
+                                        )
                                 }
                                 .inputFieldStyle()
                             }
@@ -76,13 +100,17 @@ struct CalculatorView: View {
                                 }
                                 .pickerStyle(.menu)
                                 .tint(RigAssistTheme.navy)
-                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .frame(
+                                    maxWidth: .infinity,
+                                    alignment: .leading
+                                )
                                 .padding(.horizontal, 14)
                                 .frame(height: 50)
                                 .background(
                                     RigAssistTheme.background,
                                     in: RoundedRectangle(
-                                        cornerRadius: RigAssistTheme.controlCornerRadius
+                                        cornerRadius:
+                                            RigAssistTheme.controlCornerRadius
                                     )
                                 )
 
@@ -94,12 +122,17 @@ struct CalculatorView: View {
                                         text: $slingRatedCapacity
                                     )
                                     .keyboardType(.numberPad)
-                                    .onChange(of: slingRatedCapacity) { _, newValue in
-                                        slingRatedCapacity = formatWholeNumber(newValue)
+                                    .onChange(
+                                        of: slingRatedCapacity
+                                    ) { _, newValue in
+                                        slingRatedCapacity =
+                                            formatWholeNumber(newValue)
                                     }
 
                                     Text("lb")
-                                        .foregroundStyle(RigAssistTheme.secondaryText)
+                                        .foregroundStyle(
+                                            RigAssistTheme.secondaryText
+                                        )
                                 }
                                 .inputFieldStyle()
 
@@ -120,7 +153,9 @@ struct CalculatorView: View {
                                     }
                                     .inputFieldStyle()
                                     .transition(
-                                        .opacity.combined(with: .move(edge: .top))
+                                        .opacity.combined(
+                                            with: .move(edge: .top)
+                                        )
                                     )
                                 }
                             }
@@ -149,7 +184,8 @@ struct CalculatorView: View {
                             .background(
                                 RigAssistTheme.safetyOrange,
                                 in: RoundedRectangle(
-                                    cornerRadius: RigAssistTheme.controlCornerRadius
+                                    cornerRadius:
+                                        RigAssistTheme.controlCornerRadius
                                 )
                             )
                         }
@@ -175,6 +211,18 @@ struct CalculatorView: View {
                 }
 
                 validationMessage = nil
+            }
+
+            // Navigation occurs only after the Calculation Engine
+            // successfully returns a result.
+            .navigationDestination(isPresented: $showResults) {
+                if let input = completedInput,
+                   let result = completedResult {
+                    CalculatorResultsView(
+                        input: input,
+                        result: result
+                    )
+                }
             }
         }
     }
@@ -291,7 +339,9 @@ struct CalculatorView: View {
                     .foregroundStyle(RigAssistTheme.navy)
 
                 Text(
-                    "RigAssist AI is an academic prototype. Calculator results must be verified by a qualified person before use in lift planning."
+                    "RigAssist AI is an academic prototype. "
+                    + "Calculator results must be verified by a qualified "
+                    + "person before use in lift planning."
                 )
                 .font(.footnote)
                 .foregroundStyle(RigAssistTheme.secondaryText)
@@ -328,12 +378,16 @@ struct CalculatorView: View {
             return digits
         }
 
-        return number.formatted(.number.grouping(.automatic))
+        return number.formatted(
+            .number.grouping(.automatic)
+        )
     }
 
     /// Removes display formatting before converting a weight value
     /// into a numeric value for the shared LiftInput model.
-    private func numericValue(from formattedValue: String) -> Double? {
+    private func numericValue(
+        from formattedValue: String
+    ) -> Double? {
         let unformattedValue = formattedValue
             .replacingOccurrences(of: ",", with: "")
 
@@ -355,9 +409,11 @@ struct CalculatorView: View {
         }
 
         // Rated sling capacity must be a finite value greater than zero.
-        guard let capacity = numericValue(from: slingRatedCapacity),
-              capacity.isFinite,
-              capacity > 0 else {
+        guard let capacity = numericValue(
+            from: slingRatedCapacity
+        ),
+        capacity.isFinite,
+        capacity > 0 else {
             validationMessage =
                 "Enter a valid sling rated capacity greater than 0 lb."
             return
@@ -383,7 +439,7 @@ struct CalculatorView: View {
             angle = enteredAngle
         }
 
-        // Construct LiftInput only after the UI validation succeeds.
+        // Construct LiftInput only after UI validation succeeds.
         let input = LiftInput(
             loadWeightLb: weight,
             configuration: selectedConfiguration,
@@ -396,13 +452,33 @@ struct CalculatorView: View {
 
     // MARK: - Calculation Handoff
 
-    private func submitValidatedInput(_ input: LiftInput) {
+    private func submitValidatedInput(
+        _ input: LiftInput
+    ) {
         validationMessage = nil
 
-        // Calculation intentionally remains outside the UI.
-        // This validated input will eventually be passed to the
-        // deterministic Calculation Engine.
-        print("Validated calculator input: \(input)")
+        // Pass validated input through the Calculation Engine contract.
+        // SwiftUI does not perform or reproduce safety-critical math.
+        let calculation =
+            calculationEngine.calculate(input: input)
+
+        switch calculation {
+
+        case .success(let result):
+
+            // Store the exact validated input and engine-produced result.
+            completedInput = input
+            completedResult = result
+
+            // Navigate only after both values have been stored.
+            showResults = true
+
+        case .failure(let error):
+
+            // Calculation failures remain blocking and are presented
+            // directly to the user rather than delegated to AI.
+            validationMessage = error.localizedDescription
+        }
     }
 }
 
@@ -416,7 +492,8 @@ private extension View {
             .background(
                 RigAssistTheme.background,
                 in: RoundedRectangle(
-                    cornerRadius: RigAssistTheme.controlCornerRadius
+                    cornerRadius:
+                        RigAssistTheme.controlCornerRadius
                 )
             )
     }
