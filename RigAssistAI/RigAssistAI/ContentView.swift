@@ -1,21 +1,13 @@
-//
-//  ContentView.swift
-//  RigAssistAI
-//
-//  Created by Macauley Wain on 11/2/26.
-//
-
 import SwiftUI
 
+/// Root view for the RigAssist AI application.
+///
+/// During the calculator interface development phase, the calculator is
+/// presented directly from the root view. Additional application navigation
+/// for Reference and Ask AI features can be added as those modules are built.
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        CalculatorView()
     }
 }
 
