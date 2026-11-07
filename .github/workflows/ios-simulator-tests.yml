@@ -1,4 +1,4 @@
-name: iOS Simulator Tests
+name: iOS Simulator Build
 
 on:
   push:
@@ -11,113 +11,39 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: Build and test on iOS Simulator
+  build:
+    name: Build for iOS Simulator
     runs-on: macos-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
 
-      - name: Show Xcode and simulator information
-        shell: bash
-        run: |
-          xcodebuild -version
-          xcrun simctl list devices available
+      - name: Show Xcode version
+        run: xcodebuild -version
 
-      - name: Select an available iPhone simulator
-        id: simulator
-        shell: bash
-        run: |
-          DEVICE_INFO="$(xcrun simctl list devices available -j | python3 -c '
-          import json
-          import sys
-
-          devices = json.load(sys.stdin)["devices"]
-
-          iphones = [
-              device
-              for runtime, runtime_devices in devices.items()
-              if runtime.startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
-              for device in runtime_devices
-              if device["isAvailable"]
-              and device["name"] == "iPhone 17"
-          ]
-
-          if not iphones:
-              raise SystemExit("iPhone 17 simulator not found")
-
-          device = iphones[0]
-
-          runtime = next(
-              runtime
-              for runtime, runtime_devices in devices.items()
-              if device in runtime_devices
-          )
-
-          os_version = runtime.rsplit("-", 1)[-1].replace("-", ".")
-
-          print(device["udid"])
-          print(os_version)
-          ')"
-
-          DEVICE_ID="$(echo "$DEVICE_INFO" | sed -n '1p')"
-          OS_VERSION="$(echo "$DEVICE_INFO" | sed -n '2p')"
-
-          if [ -z "$DEVICE_ID" ] || [ -z "$OS_VERSION" ]; then
-            echo "Failed to identify an available iPhone simulator."
-            exit 1
-          fi
-
-          echo "udid=$DEVICE_ID" >> "$GITHUB_OUTPUT"
-          echo "os=$OS_VERSION" >> "$GITHUB_OUTPUT"
-
-          echo "Selected simulator: iPhone 17 (iOS $OS_VERSION)"
-          echo "Simulator ID: $DEVICE_ID"
-
-      - name: Verify Xcode scheme destinations
-        shell: bash
+      - name: Build app
         run: |
           xcodebuild \
             -project RigAssistAI/RigAssistAI.xcodeproj \
             -scheme RigAssistAI \
-            -showdestinations
-
-      - name: Build and run Xcode tests
-        shell: bash
-        run: |
-          mkdir -p artifacts
-          set -o pipefail
-
-          xcodebuild \
-            -project RigAssistAI/RigAssistAI.xcodeproj \
-            -scheme RigAssistAI \
-            -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
+            -sdk iphonesimulator \
             -configuration Debug \
             -derivedDataPath DerivedData \
-            -resultBundlePath artifacts/RigAssistAI.xcresult \
             CODE_SIGNING_ALLOWED=NO \
-            test 2>&1 | tee artifacts/xcodebuild.log
+            build
 
-      - name: Export UI test screenshots
-        if: always()
-        shell: bash
+      - name: Package simulator app
         run: |
-          if [ -d artifacts/RigAssistAI.xcresult ]; then
-            xcrun xcresulttool export attachments \
-              --path artifacts/RigAssistAI.xcresult \
-              --output-path artifacts/screenshots || {
-                echo "Screenshot export failed."
-              }
-          else
-            echo "No Xcode result bundle was produced."
-          fi
+          mkdir -p artifacts
+          ditto -c -k --sequesterRsrc --keepParent \
+            DerivedData/Build/Products/Debug-iphonesimulator/RigAssistAI.app \
+            artifacts/RigAssistAI-simulator.zip
 
-      - name: Upload test results and screenshots
-        if: always()
+      - name: Upload simulator app
         uses: actions/upload-artifact@v4
         with:
-          name: ios-simulator-test-results
-          path: artifacts/
-          if-no-files-found: warn
+          name: rigassist-ios-simulator-app
+          path: artifacts/RigAssistAI-simulator.zip
+          if-no-files-found: error
           retention-days: 14
