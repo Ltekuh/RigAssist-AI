@@ -87,13 +87,12 @@ jobs:
         shell: bash
         run: |
           mkdir -p artifacts
-
           set -o pipefail
 
           xcodebuild \
             -project RigAssistAI/RigAssistAI.xcodeproj \
             -scheme RigAssistAI \
-            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=26.5' \
             -configuration Debug \
             -derivedDataPath DerivedData \
             -resultBundlePath artifacts/RigAssistAI.xcresult \
