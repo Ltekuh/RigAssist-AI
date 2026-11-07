@@ -1,0 +1,79 @@
+name: iOS Simulator Tests
+
+on:
+  push:
+    branches: ["dev", "feature-dev"]
+  pull_request:
+    branches: ["dev"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and test on iOS Simulator
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Select an available iPhone simulator
+        id: simulator
+        shell: bash
+        run: |
+          DEVICE_ID="$(xcrun simctl list devices available -j | python3 -c '
+          import json
+          import sys
+
+          devices = json.load(sys.stdin)["devices"]
+          iphone = next(
+              (
+                  device["udid"]
+                  for runtime_devices in devices.values()
+                  for device in runtime_devices
+                  if device["isAvailable"] and device["name"].startswith("iPhone")
+              ),
+              None,
+          )
+          if iphone is None:
+              raise SystemExit("No available iPhone simulator found")
+          print(iphone)
+          ')"
+          echo "udid=$DEVICE_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Build and run Xcode tests
+        shell: bash
+        run: |
+          mkdir -p artifacts
+          set -o pipefail
+          xcodebuild \
+            -project RigAssistAI/RigAssistAI.xcodeproj \
+            -scheme RigAssistAI \
+            -destination "platform=iOS Simulator,id=${{ steps.simulator.outputs.udid }}" \
+            -configuration Debug \
+            -resultBundlePath artifacts/RigAssistAI.xcresult \
+            CODE_SIGNING_ALLOWED=NO \
+            test 2>&1 | tee artifacts/xcodebuild.log
+
+      - name: Export UI test screenshots
+        if: always()
+        shell: bash
+        run: |
+          if [ -d artifacts/RigAssistAI.xcresult ]; then
+            xcrun xcresulttool export attachments \
+              --path artifacts/RigAssistAI.xcresult \
+              --output-path artifacts/screenshots
+          else
+            echo "No Xcode result bundle was produced."
+          fi
+
+      - name: Upload test results and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-simulator-test-results
+          path: artifacts/
+          if-no-files-found: warn
+          retention-days: 14

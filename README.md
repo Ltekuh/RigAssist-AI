@@ -78,6 +78,20 @@ The load operation throws if the resource is missing or cannot be decoded;
 callers should handle that error explicitly. The loader does not write or
 modify the dataset.
 
+## Build and test the iOS app
+
+The iOS app requires Xcode and an iOS Simulator, which run on macOS. The
+[iOS Simulator Tests workflow](.github/workflows/ios-simulator-tests.yml)
+runs the app and UI tests on a GitHub-hosted Mac when changes are pushed to
+`dev` or a pull request targets `dev`. You can also start it manually from the
+repository's **Actions** tab using **iOS Simulator Tests** → **Run workflow**.
+
+When the workflow finishes, download the `ios-simulator-test-results`
+artifact from its run page. It contains the Xcode test result bundle, test
+logs, and screenshots captured by UI tests. The result bundle includes test
+details and can be opened in Xcode; the exported screenshots can be viewed
+directly on Windows or Linux.
+
 ## Contributing
 
 When adding or changing reference content:
