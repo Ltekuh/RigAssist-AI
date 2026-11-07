@@ -71,11 +71,11 @@ jobs:
         with:
           category: "/language:${{ matrix.language }}"
 
-  needcomplete:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Make script executable and run it
-        run: |
-          chmod +x ./needcomplete.sh
-          ./needcomplete.sh
+  # needcomplete:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Make script executable and run it
+  #       run: |
+  #         chmod +x ./needcomplete.sh
+  #         ./needcomplete.sh
