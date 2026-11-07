@@ -20,12 +20,3 @@ jobs:
           python-version: "3.x"
       - name: Validate reference dataset
         run: python scripts/validate_reference_data.py data/reference_records.json
-
-  needcomplete:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Make script executable and run it
-        run: |
-          chmod +x ./needcomplete.sh
-          ./needcomplete.sh
