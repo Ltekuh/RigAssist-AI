@@ -7,9 +7,9 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: ["dev", "feature/leonel-reference-ai"]
   pull_request:
-    branches: [ "dev" ]
+    branches: ["dev", "feature/leonel-reference-ai"]
   schedule:
     - cron: '43 1 * * 2'
 
