@@ -1,4 +1,5 @@
 // !$*UTF8*$!
+/* Leonel's contribution: Bundle the read-only local reference dataset in the app target. */
 {
 	archiveVersion = 1;
 	classes = {
@@ -27,7 +28,12 @@
 		B0B8254E3098DD9000868519 /* RigAssistAI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RigAssistAI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0B8255B3098DD9300868519 /* RigAssistAITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RigAssistAITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0B825653098DD9300868519 /* RigAssistAIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RigAssistAIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0A2E11F2B104E6E9A3D0001 /* reference_records.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = ../data/reference_records.json; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
+
+/* Begin PBXBuildFile section */
+		C0A2E11F2B104E6E9A3D0002 /* reference_records.json in Resources */ = {isa = PBXBuildFile; fileRef = C0A2E11F2B104E6E9A3D0001 /* reference_records.json */; };
+/* End PBXBuildFile section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B0B825503098DD9000868519 /* RigAssistAI */ = {
@@ -78,6 +84,7 @@
 				B0B825503098DD9000868519 /* RigAssistAI */,
 				B0B8255E3098DD9300868519 /* RigAssistAITests */,
 				B0B825683098DD9300868519 /* RigAssistAIUITests */,
+				C0A2E11F2B104E6E9A3D0001 /* reference_records.json */,
 				B0B8254F3098DD9000868519 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -212,6 +219,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0A2E11F2B104E6E9A3D0002 /* reference_records.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

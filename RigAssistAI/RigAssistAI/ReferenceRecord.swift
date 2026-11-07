@@ -1,3 +1,4 @@
+// Leonel's contribution: Shared data models for the verified local reference library.
 import Foundation
 
 // RA-105: Swift model for the bundled, read-only reference dataset.
@@ -74,6 +75,17 @@ enum ReferenceDataLoader {
         }
         do {
             let data = try Data(contentsOf: url)
+            return try decode(data)
+        } catch let error as ReferenceDataError {
+            throw error
+        } catch {
+            throw ReferenceDataError.decodingFailed(String(describing: error))
+        }
+    }
+
+    /// Decodes local dataset bytes so the same validation path is testable without a bundle.
+    static func decode(_ data: Data) throws -> ReferenceDataset {
+        do {
             return try JSONDecoder().decode(ReferenceDataset.self, from: data)
         } catch {
             throw ReferenceDataError.decodingFailed(String(describing: error))
