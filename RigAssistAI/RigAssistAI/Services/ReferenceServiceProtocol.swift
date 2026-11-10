@@ -1,3 +1,4 @@
+// Leonel's contribution: Verified-only contract for the offline reference library.
 //
 //  ReferenceServiceProtocol.swift
 //  RigAssistAI

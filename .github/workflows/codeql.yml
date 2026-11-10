@@ -7,9 +7,9 @@ name: "CodeQL Advanced"
 
 on:
   push:
-    branches: [ "dev" ]
+    branches: ["dev", "feature/leonel-reference-ai"]
   pull_request:
-    branches: [ "dev" ]
+    branches: ["dev", "feature/leonel-reference-ai"]
   schedule:
     - cron: '43 1 * * 2'
 
@@ -70,3 +70,12 @@ jobs:
         uses: github/codeql-action/analyze@v4
         with:
           category: "/language:${{ matrix.language }}"
+
+  # needcomplete:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Make script executable and run it
+  #       run: |
+  #         chmod +x ./needcomplete.sh
+  #         ./needcomplete.sh
