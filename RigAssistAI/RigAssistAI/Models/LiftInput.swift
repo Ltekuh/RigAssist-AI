@@ -33,13 +33,13 @@ struct LiftInput: Codable, Equatable {
     /// Sling configuration selected by the user.
     let configuration: SlingConfiguration
 
-    /// Sling angle measured in degrees.
+    /// Sling angle measured in degrees from horizontal.
     ///
     /// Required for a two-leg bridle and must be between 30 and 90 degrees.
     /// A vertical hitch does not require an angle, so this value is optional.
     let angleDegrees: Double?
 
-    /// Rated capacity of the selected sling in pounds.
+    /// Rated capacity per sling leg in pounds (not the total assembly rating).
     /// Expected value: finite and greater than zero.
     let slingRatedCapacityLb: Double
 }

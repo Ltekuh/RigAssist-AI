@@ -1,0 +1,13 @@
+name: Calculation tests
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev, main]
+jobs:
+  calculator:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run deterministic core tests
+        run: swift test
