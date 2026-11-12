@@ -49,7 +49,36 @@ struct ReferenceRecord: Codable, Identifiable, Hashable {
         }
     }
 
-    var isVerified: Bool { verification.status == .verified }
+    var isVerified: Bool {
+        guard verification.status == .verified,
+              let reviewedBy = verification.reviewedBy,
+              !reviewedBy.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+              let reviewedOn = verification.reviewedOn,
+              Self.isISODate(reviewedOn),
+              [
+                source.title,
+                source.publisher,
+                source.edition,
+                source.section
+              ].allSatisfy({
+                  !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                      && !$0.localizedCaseInsensitiveContains("TO VERIFY")
+              }) else {
+            return false
+        }
+        return true
+    }
+
+    private static func isISODate(_ value: String) -> Bool {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .iso8601)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        formatter.dateFormat = "yyyy-MM-dd"
+        formatter.isLenient = false
+        guard let date = formatter.date(from: value) else { return false }
+        return formatter.string(from: date) == value
+    }
 }
 
 enum ReferenceDataError: Error, LocalizedError {

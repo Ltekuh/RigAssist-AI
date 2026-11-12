@@ -71,7 +71,10 @@ struct ConstrainedAIService: AIServiceProtocol {
             )
         }
 
-        let sources = referenceService.search(query: question, limit: maximumSources)
+        let sources = referenceService.searchForAI(
+            query: question,
+            limit: maximumSources
+        )
         guard !sources.isEmpty else {
             return fallback(
                 answer: "I could not find a verified local reference for that question. "
@@ -156,14 +159,53 @@ struct ConstrainedAIService: AIServiceProtocol {
             "compute",
             "solve for",
             "work out",
+            "determine",
+            "estimate",
+            "figure out",
             "what is the tension",
             "what's the tension",
             "how much tension",
             "tension per leg for",
             "load per leg for",
-            "leg load for"
+            "leg load for",
+            "each leg carry",
+            "per leg carry"
         ]
+        let calculationIntent = [
+            "how much",
+            "how many",
+            "what would",
+            "what will",
+            "what is",
+            "what's"
+        ]
+        let calculatedValues = [
+            "tension",
+            "load",
+            "carry",
+            "capacity",
+            "force",
+            "weight",
+            "multiplier",
+            "per leg"
+        ]
+        let numericCalculationTargets = [
+            "tension",
+            "per leg",
+            "load share",
+            "multiplier"
+        ]
+        let containsNumber = normalized.range(
+            of: #"\d"#,
+            options: .regularExpression
+        ) != nil
+
         return calculationPhrases.contains(where: normalized.contains)
             || ["+", "=", "×", "÷"].contains(where: question.contains)
+            || (containsNumber
+                && calculationIntent.contains(where: normalized.contains)
+                && calculatedValues.contains(where: normalized.contains))
+            || (containsNumber
+                && numericCalculationTargets.contains(where: normalized.contains))
     }
 }

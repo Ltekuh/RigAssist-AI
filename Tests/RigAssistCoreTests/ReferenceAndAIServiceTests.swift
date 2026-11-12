@@ -45,6 +45,47 @@ final class ReferenceAndAIServiceTests: XCTestCase {
         XCTAssertEqual(service.search(query: "  ", limit: 5), [])
     }
 
+    func testAISearchRejectsRecordsMatchingOnlyABroadSharedWord() {
+        let unrelated = record(
+            id: "REF-001",
+            status: .verified,
+            topic: "Sling inspection",
+            tags: ["sling configuration", "visual inspection"]
+        )
+        let service = LocalReferenceService(dataset: dataset(records: [unrelated]))
+
+        XCTAssertEqual(service.search(query: "sling angle", limit: 10), [unrelated])
+        XCTAssertTrue(service.searchForAI(query: "sling angle", limit: 3).isEmpty)
+    }
+
+    func testAIProviderDoesNotReceiveBroadlyMatchedUnrelatedRecords() async {
+        let unrelated = record(
+            id: "REF-001",
+            status: .verified,
+            topic: "Sling inspection",
+            tags: ["sling configuration", "visual inspection"]
+        )
+        let ai = ConstrainedAIService(
+            referenceService: LocalReferenceService(
+                dataset: dataset(records: [unrelated])
+            ),
+            provider: StubAIProvider(
+                result: .success(
+                    AIProviderAnswer(
+                        text: "This answer must not be used.",
+                        citedRecordIDs: [unrelated.id]
+                    )
+                )
+            )
+        )
+
+        let response = await ai.ask("sling angle")
+
+        XCTAssertTrue(response.isFallback)
+        XCTAssertTrue(response.sources.isEmpty)
+        XCTAssertTrue(response.answer.contains("could not find a verified local reference"))
+    }
+
     func testAIWithoutMatchingVerifiedMaterialFallsBackWithoutSources() async {
         let service = LocalReferenceService(
             dataset: dataset(records: [
@@ -156,11 +197,56 @@ final class ReferenceAndAIServiceTests: XCTestCase {
             )
         )
 
-        let response = await ai.ask("Calculate the tension per leg for a 5000 lb load")
+        for question in [
+            "Calculate the tension per leg for a 5000 lb load",
+            "Determine sling tension for a 5,000 lb load at 45 degrees",
+            "What would each leg carry at 30 degrees?",
+            "5,000 lb load at 45 degrees — tension per leg?"
+        ] {
+            let response = await ai.ask(question)
 
-        XCTAssertTrue(response.isFallback)
-        XCTAssertTrue(response.sources.isEmpty)
-        XCTAssertTrue(response.answer.contains("deterministic Calculator"))
+            XCTAssertTrue(response.isFallback, question)
+            XCTAssertTrue(response.sources.isEmpty, question)
+            XCTAssertTrue(response.answer.contains("deterministic Calculator"), question)
+        }
+    }
+
+    func testAIRejectsRecordsWithoutCompleteReviewAndSourceMetadata() {
+        let incompleteRecords = [
+            record(
+                id: "REF-001",
+                status: .verified,
+                topic: "Sling angle",
+                reviewedBy: nil
+            ),
+            record(
+                id: "REF-002",
+                status: .verified,
+                topic: "Sling angle",
+                reviewedOn: nil
+            ),
+            record(
+                id: "REF-003",
+                status: .verified,
+                topic: "Sling angle",
+                sourceEdition: "TO VERIFY"
+            ),
+            record(
+                id: "REF-004",
+                status: .verified,
+                topic: "Sling angle",
+                sourceSection: " "
+            ),
+            record(
+                id: "REF-005",
+                status: .verified,
+                topic: "Sling angle",
+                reviewedOn: "2026-02-30"
+            )
+        ]
+        let service = LocalReferenceService(dataset: dataset(records: incompleteRecords))
+
+        XCTAssertTrue(service.search(query: "sling angle", limit: 10).isEmpty)
     }
 
     func testProviderCannotCiteRecordsOutsideVerifiedContext() async {
@@ -197,26 +283,31 @@ final class ReferenceAndAIServiceTests: XCTestCase {
     private func record(
         id: String,
         status: ReferenceRecord.Verification.Status,
-        topic: String
+        topic: String,
+        tags: [String] = ["sling angle", "load angle"],
+        reviewedBy: String? = "Test reviewer",
+        reviewedOn: String? = "2026-01-01",
+        sourceEdition: String = "Test edition",
+        sourceSection: String = "Test section"
     ) -> ReferenceRecord {
         ReferenceRecord(
             id: id,
             topic: topic,
             category: .loadAngle,
-            tags: ["sling angle", "load angle"],
+            tags: tags,
             summary: "Approved summary for \(topic).",
             aiContext: "Approved AI context for \(topic).",
             relatedCalculation: nil,
             source: .init(
                 title: "Test source",
                 publisher: "Test publisher",
-                edition: "Test edition",
-                section: "Test section"
+                edition: sourceEdition,
+                section: sourceSection
             ),
             verification: .init(
                 status: status,
-                reviewedBy: status == .verified ? "Test reviewer" : nil,
-                reviewedOn: status == .verified ? "2026-01-01" : nil
+                reviewedBy: status == .verified ? reviewedBy : nil,
+                reviewedOn: status == .verified ? reviewedOn : nil
             )
         )
     }

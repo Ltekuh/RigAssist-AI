@@ -35,4 +35,11 @@ protocol ReferenceServiceProtocol {
     /// - Returns: Matching verified ReferenceRecord values, up to the
     ///   requested limit.
     func search(query: String, limit: Int) -> [ReferenceRecord]
+
+    /// Searches verified records using a stricter relevance threshold suitable
+    /// for supplying context to the AI assistant.
+    ///
+    /// Exact topic or tag matches are accepted; otherwise, at least two
+    /// meaningful query terms must match a record's topic or tags.
+    func searchForAI(query: String, limit: Int) -> [ReferenceRecord]
 }

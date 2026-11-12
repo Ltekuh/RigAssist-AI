@@ -28,7 +28,7 @@ technical accuracy or approve content for operational use.
 | [`RigAssistAI/RigAssistAI/Services/ConstrainedAIService.swift`](RigAssistAI/RigAssistAI/Services/ConstrainedAIService.swift) | Reference-grounded AI orchestration and controlled offline fallbacks. |
 | [`docs/reference-data.md`](docs/reference-data.md) | Dataset schema, field requirements, and content rules. |
 | [`scripts/validate_reference_data.py`](scripts/validate_reference_data.py) | Checks the JSON dataset against the schema rules. |
-| [`validate-reference-data.yml`](validate-reference-data.yml) | GitHub Actions workflow that validates changes to the dataset and validator. |
+| [`.github/workflows/validate-reference-data.yml`](.github/workflows/validate-reference-data.yml) | GitHub Actions workflow that validates changes to the dataset and validator. |
 
 The AI provider interface is injectable, but no external provider or API
 credentials are configured. Until one is supplied, Ask AI can only show
@@ -64,9 +64,8 @@ rules. You can also pass a different JSON file as the first argument:
 python3 scripts/validate_reference_data.py path/to/reference_records.json
 ```
 
-[`validate-reference-data.yml`](validate-reference-data.yml) contains a
-workflow definition for this validation. GitHub Actions automatically discovers
-workflow files only when they are placed under `.github/workflows/`.
+[`.github/workflows/validate-reference-data.yml`](.github/workflows/validate-reference-data.yml)
+contains the workflow definition for this validation.
 
 ## Build and test
 

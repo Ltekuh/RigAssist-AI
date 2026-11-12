@@ -61,7 +61,7 @@ record carries source metadata so any statement can be traced.
 2. `id` values are unique and match `REF-###`.
 3. `category` is from the allowed list.
 4. `tags` has at least two entries, all lowercase.
-5. `verified` records must have `reviewedBy` and `reviewedOn` set, and no `TO VERIFY` text in `source`.
+5. `verified` records must have non-empty `reviewedBy` and valid `reviewedOn` (`YYYY-MM-DD`) values, and no `TO VERIFY` text in `source`. The app also rejects invalid calendar dates before exposing a record.
 6. `unverified` records must not have `reviewedBy` or `reviewedOn` set.
 7. The app must show the `disclaimer` and each record's source wherever reference content appears.
 
@@ -71,7 +71,7 @@ record carries source metadata so any statement can be traced.
   sources, split it into two records.
 - **`aiContext` is separate from `summary`.** Lets the AI context stay precise while the UI text stays
   readable, and they can be identical when that is enough.
-- **Retrieval is tag/topic matching** in the Reference Service (RA-116). No embeddings or vector search.
+- **Retrieval is tag/topic matching** in the Reference Service (RA-116). The Reference Library can use broad matches, while AI context requires an exact topic/tag match or at least two meaningful query terms matching the topic/tags. No embeddings or vector search.
 - **Unverified flag is explicit.** Content cannot be mistaken for reviewed material. The AI service
   should only be given `verified` records in the final build.
 - The offline Reference Service filters out every record that is not `verified`.
