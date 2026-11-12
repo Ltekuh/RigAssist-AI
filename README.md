@@ -2,8 +2,8 @@
 
 RigAssist AI is a prototype project exploring how a digital assistant can support
 rigging and lift-planning workflows. This repository currently contains the
-foundation for its curated reference library: a structured JSON dataset, a Swift
-model and loader, and a validator for keeping the dataset consistent.
+SwiftUI calculator, a deterministic local calculation engine, and the
+foundation for its curated reference library.
 
 ## Important safety note
 
@@ -27,9 +27,12 @@ accuracy or approve content for operational use.
 | [`scripts/validate_reference_data.py`](scripts/validate_reference_data.py) | Checks the JSON dataset against the schema rules. |
 | [`validate-reference-data.yml`](validate-reference-data.yml) | GitHub Actions workflow that validates changes to the dataset and validator. |
 
-This repository does not currently include a complete app, an AI service, or
-calculator implementations. The reference dataset and Swift loader are intended
-to support future app work.
+The calculator uses `CalculationEngine` through the existing shared protocol.
+It supports a vertical hitch and an equal-share two-leg bridle, with angles
+measured from horizontal and rated capacity supplied per leg. See
+[calculation architecture, tests, and offline acceptance](docs/calculation-engine.md).
+Run calculator unit tests with `swift test`; the engine has no network or AI
+dependency. Reference/AI service integration is being reviewed separately in PR #5.
 
 ## Reference dataset
 
