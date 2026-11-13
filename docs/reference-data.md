@@ -1,6 +1,6 @@
 # RigAssist AI – Reference Data Structure (RA-105)
 
-**Owner:** Leonel  **Status:** Draft for team sign-off (Macauley, Jordy)
+**Owner:** Leonel  **Status:** Implementation available; source verification and team sign-off pending
 **Depends on:** RA-101 (MVP scope)  **Feeds:** RA-106, RA-116, RA-117, RA-119
 
 ## Purpose
@@ -12,7 +12,7 @@ record carries source metadata so any statement can be traced.
 ## File
 
 - Path in repo: `data/reference_records.json`
-- Bundled in the Xcode target as a resource (copy into the app bundle; never written at runtime)
+- Bundled in the Xcode target as a read-only resource; never written at runtime
 - Swift model: `ReferenceRecord.swift`
 
 ## File-level fields
@@ -61,7 +61,7 @@ record carries source metadata so any statement can be traced.
 2. `id` values are unique and match `REF-###`.
 3. `category` is from the allowed list.
 4. `tags` has at least two entries, all lowercase.
-5. `verified` records must have `reviewedBy` and `reviewedOn` set, and no `TO VERIFY` text in `source`.
+5. `verified` records must have non-empty `reviewedBy` and valid `reviewedOn` (`YYYY-MM-DD`) values, and no `TO VERIFY` text in `source`. The app also rejects invalid calendar dates before exposing a record.
 6. `unverified` records must not have `reviewedBy` or `reviewedOn` set.
 7. The app must show the `disclaimer` and each record's source wherever reference content appears.
 
@@ -71,9 +71,21 @@ record carries source metadata so any statement can be traced.
   sources, split it into two records.
 - **`aiContext` is separate from `summary`.** Lets the AI context stay precise while the UI text stays
   readable, and they can be identical when that is enough.
-- **Retrieval is tag/topic matching** in the Reference Service (RA-116). No embeddings or vector search.
+- **Retrieval is tag/topic matching** in the Reference Service (RA-116). The Reference Library can use broad matches, while AI context requires an exact topic/tag match or at least two meaningful query terms matching the topic/tags. No embeddings or vector search.
 - **Unverified flag is explicit.** Content cannot be mistaken for reviewed material. The AI service
   should only be given `verified` records in the final build.
+- The offline Reference Service filters out every record that is not `verified`.
+- Ask AI retrieves only those same verified records. If none match, the question is unsupported,
+  or an AI provider is unavailable, the service returns a controlled fallback and never calculates.
+- The AI provider is an injectable interface only. An external provider and its secure credential
+  configuration must be selected before generated AI answers can be enabled.
+
+## Current approval status
+
+The current dataset contains 11 records, all marked `unverified`; their source editions and sections
+are still marked `TO VERIFY`. The app intentionally presents no reference content until a qualified
+reviewer verifies the source details and approves the summaries. Structural validation alone does
+not constitute technical approval.
 
 ## Open items for team sign-off
 

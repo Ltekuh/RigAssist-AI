@@ -1,9 +1,9 @@
 # RigAssist AI
 
-RigAssist AI is a prototype project exploring how a digital assistant can support
-rigging and lift-planning workflows. This repository currently contains the
-foundation for its curated reference library: a structured JSON dataset, a Swift
-model and loader, and a validator for keeping the dataset consistent.
+RigAssist AI is a prototype exploring how a digital assistant can support
+rigging and lift-planning workflows. It includes a SwiftUI calculator interface,
+a read-only local reference library, and a constrained Ask AI interface. The
+deterministic calculation engine is still a mock.
 
 ## Important safety note
 
@@ -13,23 +13,27 @@ site requirements, or the judgment of a qualified person. Verify information
 against its original source and have a qualified person approve every lift.
 Never use this prototype as the sole basis for a lifting decision.
 
-The bundled records are currently marked **unverified**. Passing the data
-validator checks structure and required fields; it does not verify technical
-accuracy or approve content for operational use.
+All records in the bundled dataset are currently marked **unverified**, so the
+Reference and Ask AI screens deliberately return no record content. Passing
+the data validator checks structure and required fields; it does not verify
+technical accuracy or approve content for operational use.
 
 ## What is in this repository
 
 | Path | Purpose |
 | --- | --- |
 | [`data/reference_records.json`](data/reference_records.json) | Bundled, read-only reference dataset. |
-| [`ReferenceRecord.swift`](ReferenceRecord.swift) | Codable Swift models and a loader for the dataset. |
+| [`RigAssistAI/RigAssistAI/ReferenceRecord.swift`](RigAssistAI/RigAssistAI/ReferenceRecord.swift) | Codable Swift models and a loader for the dataset. |
+| [`RigAssistAI/RigAssistAI/Services/LocalReferenceService.swift`](RigAssistAI/RigAssistAI/Services/LocalReferenceService.swift) | Offline topic/tag search that returns only verified records. |
+| [`RigAssistAI/RigAssistAI/Services/ConstrainedAIService.swift`](RigAssistAI/RigAssistAI/Services/ConstrainedAIService.swift) | Reference-grounded AI orchestration and controlled offline fallbacks. |
 | [`docs/reference-data.md`](docs/reference-data.md) | Dataset schema, field requirements, and content rules. |
 | [`scripts/validate_reference_data.py`](scripts/validate_reference_data.py) | Checks the JSON dataset against the schema rules. |
-| [`validate-reference-data.yml`](validate-reference-data.yml) | GitHub Actions workflow that validates changes to the dataset and validator. |
+| [`.github/workflows/validate-reference-data.yml`](.github/workflows/validate-reference-data.yml) | GitHub Actions workflow that validates changes to the dataset and validator. |
 
-This repository does not currently include a complete app, an AI service, or
-calculator implementations. The reference dataset and Swift loader are intended
-to support future app work.
+The AI provider interface is injectable, but no external provider or API
+credentials are configured. Until one is supplied, Ask AI can only show
+verified local reference text as a fallback; it never calculates rigging
+loads.
 
 ## Reference dataset
 
@@ -60,23 +64,32 @@ rules. You can also pass a different JSON file as the first argument:
 python3 scripts/validate_reference_data.py path/to/reference_records.json
 ```
 
-[`validate-reference-data.yml`](validate-reference-data.yml) contains a
-workflow definition for this validation. GitHub Actions automatically discovers
-workflow files only when they are placed under `.github/workflows/`.
+[`.github/workflows/validate-reference-data.yml`](.github/workflows/validate-reference-data.yml)
+contains the workflow definition for this validation.
 
-## Swift integration
+## Build and test
 
-Add `ReferenceRecord.swift` to the Swift target and include
-`data/reference_records.json` in the app bundle as a resource. The loader
-decodes the bundled `reference_records.json` into a `ReferenceDataset`:
+Run the platform-independent Reference/AI service tests from the repository
+root with `swift test`. Building or running the SwiftUI app and its UI tests
+requires Xcode on macOS and an iOS Simulator. The Xcode project bundles
+`data/reference_records.json` read-only; a missing or malformed resource is
+reported in the app rather than silently ignored.
 
-```swift
-let dataset = try ReferenceDataLoader.load()
-```
+## Development workflow
 
-The load operation throws if the resource is missing or cannot be decoded;
-callers should handle that error explicitly. The loader does not write or
-modify the dataset.
+`main` is the stable branch and `dev` is the integration branch. Work on
+`feature/<name>-<topic>` branches, then open a pull request into `dev`; do not
+develop directly on `main` or `dev`. Require at least one review from someone
+other than the author, and request changes when integration or safety
+requirements are not met. Merge `dev` into `main` only after the combined app
+has been built and the UI, calculation, reference, and AI components have been
+integration-tested.
+
+AI assistance may be used for test generation and code improvement. Review
+AI-assisted changes manually, build and test them, and have them peer-reviewed
+through the same pull request process. Rigging calculations remain
+deterministic and must be checked against approved calculation rules; AI
+answers are not calculation results.
 
 ## Contributing
 

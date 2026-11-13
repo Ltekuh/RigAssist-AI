@@ -1,3 +1,4 @@
+// Leonel's contribution: Verify the integrated Reference and Ask AI navigation fallback.
 //
 //  RigAssistAIUITests.swift
 //  RigAssistAIUITests
@@ -28,9 +29,28 @@ final class RigAssistAIUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        // XCUIAutomation Documentation
-        // https://developer.apple.com/documentation/xcuiautomation
+        XCTAssertTrue(app.tabBars.buttons["Calculator"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.tabBars.buttons["Reference"].exists)
+        XCTAssertTrue(app.tabBars.buttons["Ask AI"].exists)
+    }
+
+    @MainActor
+    func testAskAIExplainsWhenNoVerifiedReferencesExist() throws {
+        let app = XCUIApplication()
+        app.launch()
+
+        app.tabBars.buttons["Ask AI"].tap()
+        let questionField = app.descendants(matching: .any)
+            .matching(identifier: "assistant.question")
+            .firstMatch
+        XCTAssertTrue(questionField.waitForExistence(timeout: 5))
+        questionField.tap()
+        questionField.typeText("sling angle")
+        app.buttons["Ask"].tap()
+
+        let answer = app.staticTexts["assistant.answer"]
+        XCTAssertTrue(answer.waitForExistence(timeout: 5))
+        XCTAssertTrue(answer.label.contains("verified local reference"))
     }
 
     @MainActor

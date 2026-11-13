@@ -1,3 +1,4 @@
+// Leonel's contribution: Contract for source-attributed, controlled AI answers.
 //
 //  AIServiceProtocol.swift
 //  RigAssistAI
