@@ -26,20 +26,16 @@ struct ContentView: View {
 
     // MARK: - Service Dependencies
 
-    /// Reference service used by the Reference Library interface.
+    /// Production local reference service loaded from the bundled
+    /// reference dataset.
     ///
-    /// MockReferenceService is used during interface development so the
-    /// Reference UI can be developed independently from the production
-    /// local reference service.
-    private let referenceService: any ReferenceServiceProtocol =
-        MockReferenceService()
+    /// The service exposes only reference records that satisfy the
+    /// project's verified-record requirements.
+    @State private var referenceService: LocalReferenceService?
 
-    /// AI service used by the Ask AI interface.
-    ///
-    /// MockAIService allows the complete assistant interface to be tested
-    /// before the production constrained AI service is integrated.
-    private let aiService: any AIServiceProtocol =
-        MockAIService()
+    /// Stores an error encountered while loading the bundled
+    /// reference dataset.
+    @State private var loadError: String?
 
     // MARK: - Body
 
@@ -58,27 +54,89 @@ struct ContentView: View {
 
             // MARK: Reference Library
 
-            ReferenceLibraryView(
-                referenceService: referenceService
-            )
-            .tabItem {
-                Label(
-                    "Reference",
-                    systemImage: "books.vertical.fill"
+            if let referenceService {
+                ReferenceLibraryView(
+                    referenceService: referenceService
                 )
+                .tabItem {
+                    Label(
+                        "Reference",
+                        systemImage: "books.vertical.fill"
+                    )
+                }
+            } else {
+                referenceServiceStatus
+                    .tabItem {
+                        Label(
+                            "Reference",
+                            systemImage: "books.vertical.fill"
+                        )
+                    }
             }
 
             // MARK: Ask AI
 
-            AskAIView(
-                aiService: aiService
-            )
-            .tabItem {
-                Label(
-                    "Ask AI",
-                    systemImage: "sparkles"
+            if let referenceService {
+                AskAIView(
+                    aiService: ConstrainedAIService(
+                        referenceService: referenceService
+                    ),
+                    disclaimer: referenceService.disclaimer
                 )
+                .tabItem {
+                    Label(
+                        "Ask AI",
+                        systemImage: "sparkles"
+                    )
+                }
+            } else {
+                referenceServiceStatus
+                    .tabItem {
+                        Label(
+                            "Ask AI",
+                            systemImage: "sparkles"
+                        )
+                    }
             }
+        }
+        .task {
+            loadReferenceData()
+        }
+    }
+
+    // MARK: - Reference Service Status
+
+    /// Displays a loading state while the bundled reference data is being
+    /// initialized and a user-facing error if initialization fails.
+    @ViewBuilder
+    private var referenceServiceStatus: some View {
+        if let loadError {
+            ContentUnavailableView(
+                "Reference data unavailable",
+                systemImage: "exclamationmark.triangle",
+                description: Text(loadError)
+            )
+        } else {
+            ProgressView("Loading local reference data…")
+        }
+    }
+
+    // MARK: - Reference Data Loading
+
+    /// Loads the bundled reference dataset once and initializes the
+    /// production LocalReferenceService.
+    ///
+    /// Failure is surfaced to the user instead of silently falling back
+    /// to mock or unverified reference information.
+    private func loadReferenceData() {
+        guard referenceService == nil, loadError == nil else {
+            return
+        }
+
+        do {
+            referenceService = try LocalReferenceService(bundle: .main)
+        } catch {
+            loadError = error.localizedDescription
         }
     }
 }

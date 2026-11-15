@@ -20,13 +20,9 @@ struct CalculatorView: View {
 
     // MARK: - Calculation State
 
-    /// Temporary engine used while the production deterministic
-    /// Calculation Engine is being implemented.
-    ///
-    /// The UI communicates through CalculationEngineProtocol so the
-    /// production engine can replace the mock without redesigning the view.
+    /// The calculator runs locally and has no AI or network dependency.
     private let calculationEngine: any CalculationEngineProtocol =
-        MockCalculationEngine()
+        CalculationEngine()
 
     /// Stores the validated input used for the completed calculation.
     @State private var completedInput: LiftInput?
@@ -114,7 +110,7 @@ struct CalculatorView: View {
                                     )
                                 )
 
-                                fieldLabel("Rated Capacity")
+                                fieldLabel("Rated Capacity Per Leg")
 
                                 HStack {
                                     TextField(
@@ -137,7 +133,7 @@ struct CalculatorView: View {
                                 .inputFieldStyle()
 
                                 if selectedConfiguration == .twoLegBridle {
-                                    fieldLabel("Sling Angle")
+                                    fieldLabel("Sling Angle From Horizontal")
 
                                     HStack {
                                         TextField(
@@ -477,7 +473,7 @@ struct CalculatorView: View {
 
             // Calculation failures remain blocking and are presented
             // directly to the user rather than delegated to AI.
-            validationMessage = error.localizedDescription
+            validationMessage = error.userMessage
         }
     }
 }
