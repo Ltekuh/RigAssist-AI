@@ -120,4 +120,24 @@ struct MockReferenceService: ReferenceServiceProtocol {
 
         return Array(matches.prefix(limit))
     }
+
+    // MARK: - AI Reference Search
+
+    /// Provides sample reference records for AI grounding during
+    /// interface development.
+    ///
+    /// The production LocalReferenceService is responsible for applying
+    /// the stricter relevance and verification requirements used by the
+    /// real AI workflow. The mock intentionally reuses its lightweight
+    /// development search so it satisfies ReferenceServiceProtocol
+    /// without duplicating production retrieval logic.
+    func searchForAI(
+        query: String,
+        limit: Int
+    ) -> [ReferenceRecord] {
+        search(
+            query: query,
+            limit: limit
+        )
+    }
 }
