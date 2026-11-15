@@ -15,16 +15,19 @@ comparisons, overload warnings, model-assumption warnings, eight calculator
 unit tests, and a macOS test workflow. The input screen uses the real engine,
 labels the angle/capacity conventions, and displays typed error messages.
 
-Validation: 8 calculator tests passed; the same 8 passed with process network
-access denied. iOS Simulator SDK Debug build passed. A temporary integration
-copy of PR #5 passed all 22 combined calculator/reference/AI tests and its
-combined iOS Simulator SDK app build. The data
-validator passed with 11 unverified records. Device-level offline UI acceptance
-is still pending; see docs/calculation-engine.md for the acceptance checklist.
+Updated from `dev` at `dfcd7b3` after PR #5 merged. Reconciled Package.swift
+so the calculator and Reference/AI service sources share RigAssistCore, and
+both test files remain in RigAssistCoreTests. The README retains both sets of
+documentation. Leonel's services, tests, navigation, and resources are retained.
+
+Validation on the updated branch: all 22 combined tests passed (8 calculator
+and 14 Reference/AI). The same 22 passed with process network access denied.
+The combined iOS Simulator SDK Debug app build passed. Existing actor-isolation
+warnings remain in LocalReferenceService at lines 41 and 88. The reference
+validator passed with 11 unverified records; no dataset changes were made.
+`git diff --check` passed.
 
 Base: dev. Another team member should review the calculation rules and tests
-before merging. If PR #5 merges first, reconcile Package.swift to retain both
-contributors' source lists and tests, then rerun the complete suite. The
-combined manifest was tested in a temporary copy; this PR does not merge or
-modify PR #5. Results remain academic prototype outputs requiring qualified
-human verification.
+before merging. Final UI integration and simulator/offline QA remain for PR #6;
+see docs/calculation-engine.md for the device acceptance checklist. Results
+remain academic prototype outputs requiring qualified human verification.

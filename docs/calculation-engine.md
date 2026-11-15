@@ -70,13 +70,14 @@ Review the diff, commit only these files, push that feature branch, and open a
 PR with **base dev**. Have another team member review before merging. Do not
 push directly to dev/main or merge teammates' PRs as part of this work.
 
-PR #5 also introduces `Package.swift` for reference/AI tests. If it merges
-first, resolve the add/add manifest conflict by keeping **both** sets of core
-sources and tests under its `RigAssistCore` / `RigAssistCoreTests` targets;
-remove the calculator files from its excludes. Keep its reference/AI sources,
-and continue excluding the SwiftUI views and mock. Run all calculator and
-reference/AI tests after reconciliation, then build the combined app. Do not
-replace the manifest with only one contributor's target list.
+PR #5 has merged into `dev`. This branch merges `origin/dev` at
+`dfcd7b3` and reconciles `Package.swift` to compile both the calculation engine
+and Reference/AI services in `RigAssistCore`. Both test files remain in
+`RigAssistCoreTests` and run together with `swift test`. SwiftUI views,
+assets, and the development mock remain excluded from the package; the Xcode
+app still includes its interface and bundled reference resource. The README
+retains the reference/AI documentation and describes the real calculator.
+The final UI integration and simulator/offline QA remain with PR #6.
 
 ## Validation performed on November 12, 2026
 
@@ -100,3 +101,23 @@ The restricted local environment needed `swift test --disable-sandbox` and
 module caches under `/tmp` to compile the test package. This only disables
 SwiftPM's nested build sandbox. Network denial was applied separately to the
 compiled test process for the offline check.
+
+## Update from merged dev on November 15, 2026
+
+Merged `origin/dev` at `dfcd7b3` into `feature/jordy-calculation-engine`.
+Resolved the Package.swift add/add conflict by keeping both contributors'
+core sources and tests in the shared package, and resolved the README conflict
+by retaining the calculator and Reference/AI documentation.
+
+Validation on the reconciled branch:
+
+- `swift test`: 22 tests passed with zero failures (8 calculator and 14 Reference/AI).
+- The same combined XCTest bundle with `(deny network*)`: 22 tests passed.
+- iOS Simulator SDK Debug build with code signing disabled: succeeded.
+- Existing actor-isolation warnings remain in `LocalReferenceService.swift`
+  at lines 41 and 88; no service behavior was changed in this merge.
+- Reference validator: 11 valid records, all unverified; dataset unchanged.
+- `git diff --check`: clean.
+
+Final UI integration and device/simulator offline acceptance remain for PR #6.
+No final UI QA or lift approval is claimed by the core test/build results.
