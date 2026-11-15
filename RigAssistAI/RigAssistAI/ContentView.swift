@@ -80,8 +80,7 @@ struct ContentView: View {
                 AskAIView(
                     aiService: ConstrainedAIService(
                         referenceService: referenceService
-                    ),
-                    disclaimer: referenceService.disclaimer
+                    )
                 )
                 .tabItem {
                     Label(
