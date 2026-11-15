@@ -2,8 +2,8 @@
 
 RigAssist AI is a prototype exploring how a digital assistant can support
 rigging and lift-planning workflows. It includes a SwiftUI calculator interface,
-a read-only local reference library, and a constrained Ask AI interface. The
-deterministic calculation engine is still a mock.
+a deterministic local calculation engine, a read-only local reference library,
+and a constrained Ask AI interface.
 
 ## Important safety note
 
@@ -29,6 +29,12 @@ technical accuracy or approve content for operational use.
 | [`docs/reference-data.md`](docs/reference-data.md) | Dataset schema, field requirements, and content rules. |
 | [`scripts/validate_reference_data.py`](scripts/validate_reference_data.py) | Checks the JSON dataset against the schema rules. |
 | [`.github/workflows/validate-reference-data.yml`](.github/workflows/validate-reference-data.yml) | GitHub Actions workflow that validates changes to the dataset and validator. |
+
+The calculator uses `CalculationEngine` through the existing shared protocol.
+It supports a vertical hitch and an equal-share two-leg bridle, with angles
+measured from horizontal and rated capacity supplied per leg. See
+[calculation architecture, tests, and offline acceptance](docs/calculation-engine.md).
+The engine has no network or AI dependency.
 
 The AI provider interface is injectable, but no external provider or API
 credentials are configured. Until one is supplied, Ask AI can only show
@@ -69,8 +75,9 @@ contains the workflow definition for this validation.
 
 ## Build and test
 
-Run the platform-independent Reference/AI service tests from the repository
-root with `swift test`. Building or running the SwiftUI app and its UI tests
+Run the combined calculation engine and Reference/AI service tests from the
+repository root with `swift test`. Both suites share the `RigAssistCore` package
+and `RigAssistCoreTests` target. Building or running the SwiftUI app and its UI tests
 requires Xcode on macOS and an iOS Simulator. The Xcode project bundles
 `data/reference_records.json` read-only; a missing or malformed resource is
 reported in the app rather than silently ignored.

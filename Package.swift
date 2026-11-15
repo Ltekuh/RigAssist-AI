@@ -1,5 +1,5 @@
 // swift-tools-version: 5.9
-// Leonel's contribution: Cross-platform test target for Reference and AI service logic.
+// Shared test target for the calculation engine and Reference/AI services.
 import PackageDescription
 
 let package = Package(
@@ -19,14 +19,15 @@ let package = Package(
                 "Assets.xcassets",
                 "ContentView.swift",
                 "Design",
-                "Models/CalculationError.swift",
-                "Models/CalculationResult.swift",
                 "RigAssistAIApp.swift",
-                "Services/CalculationEngineProtocol.swift",
                 "Services/MockCalculationEngine.swift",
                 "Views"
             ],
             sources: [
+                "Models/CalculationError.swift",
+                "Models/CalculationResult.swift",
+                "Services/CalculationEngineProtocol.swift",
+                "Services/CalculationEngine.swift",
                 "ReferenceRecord.swift",
                 "Models/LiftInput.swift",
                 "Services/AIServiceProtocol.swift",
