@@ -1,0 +1,91 @@
+Unit 5 Assignment: Alpha Release and Peer Review — Team and Individual Components
+Purpose
+To evaluate your ability to deliver a functional Alpha software release with integrated AI features, execute professional peer review processes, and analyze technical debt impacts on system reliability while demonstrating collaborative development practices.
+
+Associated Skills
+You will demonstrate your ability to:
+
+Explain debugging methodologies and testing frameworks
+Apply automated testing and continuous integration practices
+Implement code review and quality assurance processes
+Synthesize feedback from automated tools and team members
+Analyze code quality using established metrics and standards
+Apply peer review processes to improve code quality
+Evaluate code quality and maintainability metrics
+Generate reliable and maintainable software solutions
+Assess personal and team performance objectively
+Formulate actionable improvements based on feedback
+Demonstrate responsibility for collective code quality
+Instructions
+Team Component - Alpha Release Submission:
+
+Submit a link to your shared GitHub repository containing the Alpha Release. Your code must successfully pass the CI/CD pipeline established in Unit 4. The AI feature must be functional in a basic operational state, demonstrating core capabilities even if not fully polished.
+
+Consider your Alpha release like a prototype car that automotive companies show at trade shows. The vehicle must start, drive, and demonstrate its key innovative features (like autonomous parking or voice control), but it does not need perfect paint or luxury interior details. Similarly, your Alpha must prove that core functionality works and integrates properly, establishing confidence that the final product will meet requirements.
+
+Your Alpha release must include:
+
+Multi-module integration demonstrating system cohesion
+Functional AI component with basic operational capabilities
+Successful CI/CD pipeline execution
+Core MVP features in working condition
+Proper version control practices with meaningful commit messages
+Individual Component - Peer Review Process:
+
+Each team member must perform a formal peer review on one teammate's module and submit a 250-word Refinement Report detailing specific changes made based on feedback received.
+
+Professional peer reviews function like medical consultations where specialists examine patient cases together. A cardiologist might review a case with a neurologist to ensure treatment plans do not conflict and identify potential complications. Similarly, your code review should examine your teammate's work with fresh eyes, identifying potential issues they might have missed and suggesting improvements that enhance overall system quality.
+
+Your peer review must address:
+
+Code quality and readability standards
+Security vulnerabilities or potential risks
+Performance optimization opportunities
+Integration compatibility with other modules
+Documentation completeness and clarity
+Technical Debt Analysis:
+
+Your Refinement Report must demonstrate Professional Integrity by honestly identifying instances of "Technical Debt" and documenting how these issues were mitigated. Technical debt resembles financial debt; taking shortcuts now (like using quick fixes or temporary solutions) creates interest payments later in the form of increased maintenance costs, reduced system reliability, and more complex future modifications.
+
+For example, if your team chose to hardcode configuration values instead of creating a proper configuration management system to meet a deadline, this creates technical debt. The immediate benefit is faster delivery, but the long-term cost includes difficulty making changes, increased testing complexity, and potential security vulnerabilities. Your analysis should identify such instances and propose specific mitigation strategies.
+
+Deliverables
+
+GitHub Repository Link: Shared repository containing functional Alpha release
+Individual Refinement Report: 250-word document per team member analyzing peer review findings and technical debt mitigation strategies
+Team Setup (Day 1): Your team must meet on Day 1 to assign the following internal roles:
+
+Lead Architect: Manages system diagrams and overall architecture documentation
+Interface Designer: Manages API specifications and data interface documentation
+Integration Lead: Manages AI feature implementation and integration layout
+Think of this role assignment like organizing a restaurant kitchen during a busy dinner service. Each chef has specific responsibilities; the head chef (Lead Architect) oversees the entire operation, the sous chef (Interface Designer) manages how different stations communicate and share ingredients, and the specialty chef (Integration Lead) handles the signature dishes that make the restaurant unique. Just as successful restaurants require clear communication and defined roles, your software project needs structured leadership to deliver a quality product on schedule.
+
+Evidence Statements:
+
+You will demonstrate your ability to deliver a functional Alpha release that integrates core MVP features with a working AI component, showing effective implementation of collaborative workflows and automated testing practices.
+You will show your understanding of professional peer review processes by conducting structured code reviews that identify specific quality vulnerabilities and suggest concrete remediation strategies.
+You will analyze the impact of technical debt by documenting specific instances where implementation shortcuts created maintainability challenges, then formulating targeted mitigation strategies that balance immediate delivery needs with long-term code quality and system reliability.
+Submission Guidelines / Criteria for Success
+Alpha Release Criteria:
+
+Repository link provides access to complete, integrated codebase
+All code passes established CI/CD pipeline without errors
+AI functionality demonstrates basic operational capabilities
+Multi-module architecture shows proper integration
+Core MVP features function as specified
+Version control history shows collaborative development practices
+Refinement Report Criteria:
+
+Exactly 250 words addressing peer review findings
+Specific identification of technical debt instances with concrete examples
+Clear documentation of changes made based on peer feedback
+Professional tone demonstrating integrity and objective assessment
+Actionable mitigation strategies for identified technical debt
+Evidence of structured peer review process following industry standards
+Professional Standards:
+
+Code follows established style guidelines and best practices
+Documentation provides clear installation and usage instructions
+Security considerations addressed appropriately
+Performance benchmarks meet minimum acceptable thresholds
+Error handling implemented for critical system functions

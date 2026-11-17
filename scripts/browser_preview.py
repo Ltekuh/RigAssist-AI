@@ -19,7 +19,7 @@ HTML = r"""<!doctype html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>RigAssist AI — Browser Sample</title>
+  <title>RigAssist AI - Browser Sample</title>
   <style>
     :root {
       color-scheme: light;
