@@ -61,7 +61,7 @@ record carries source metadata so any statement can be traced.
 2. `id` values are unique and match `REF-###`.
 3. `category` is from the allowed list.
 4. `tags` has at least two entries, all lowercase.
-5. `verified` records must have non-empty `reviewedBy` and valid `reviewedOn` (`YYYY-MM-DD`) values, and no `TO VERIFY` text in `source`. The app also rejects invalid calendar dates before exposing a record.
+5. `verified` records must have non-empty `reviewedBy` and valid calendar `reviewedOn` (`YYYY-MM-DD`) values, and no `TO VERIFY` text in `source` (case-insensitive). The app also checks these conditions before exposing a record.
 6. `unverified` records must not have `reviewedBy` or `reviewedOn` set.
 7. The app must show the `disclaimer` and each record's source wherever reference content appears.
 
@@ -86,6 +86,12 @@ The current dataset contains 11 records, all marked `unverified`; their source e
 are still marked `TO VERIFY`. The app intentionally presents no reference content until a qualified
 reviewer verifies the source details and approves the summaries. Structural validation alone does
 not constitute technical approval.
+
+The UI integration tests use a separate, explicitly labeled synthetic fixture and a deterministic
+test provider, enabled only by a debug-build launch argument. They exercise navigation, citation,
+calculation blocking, and provider-failure fallback without changing the bundled approval status.
+Run `RigAssistAIUITests` with Xcode and an iOS Simulator; these tests do not establish technical
+accuracy or exercise an external AI provider.
 
 ## Open items for team sign-off
 

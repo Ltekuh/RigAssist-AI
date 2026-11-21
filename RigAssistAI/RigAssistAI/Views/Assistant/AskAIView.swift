@@ -26,6 +26,7 @@ struct AskAIView: View {
     /// The production ConstrainedAIService can later be injected without
     /// requiring the user interface to know how that service is implemented.
     let aiService: any AIServiceProtocol
+    let disclaimer: String
 
     // MARK: - State
 
@@ -334,8 +335,7 @@ struct AskAIView: View {
             Divider()
 
             Text(
-                "Verify guidance against applicable standards, manufacturer " +
-                "instructions, and the judgment of a qualified person."
+                disclaimer
             )
             .font(.caption)
             .foregroundStyle(RigAssistTheme.secondaryText)
@@ -365,6 +365,10 @@ struct AskAIView: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .foregroundStyle(RigAssistTheme.primaryText)
+
+                Text(source.id)
+                    .font(.caption)
+                    .foregroundStyle(RigAssistTheme.secondaryText)
 
                 Text(source.source.title)
                     .font(.caption)
@@ -424,6 +428,7 @@ struct AskAIView: View {
 
 #Preview {
     AskAIView(
-        aiService: MockAIService()
+        aiService: MockAIService(),
+        disclaimer: MockReferenceService().disclaimer
     )
 }

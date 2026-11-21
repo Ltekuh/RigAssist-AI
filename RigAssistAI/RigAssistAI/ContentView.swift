@@ -79,8 +79,10 @@ struct ContentView: View {
             if let referenceService {
                 AskAIView(
                     aiService: ConstrainedAIService(
-                        referenceService: referenceService
-                    )
+                        referenceService: referenceService,
+                        provider: integrationTestProvider
+                    ),
+                    disclaimer: referenceService.disclaimer
                 )
                 .tabItem {
                     Label(
@@ -133,10 +135,27 @@ struct ContentView: View {
         }
 
         do {
+            #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("--ui-testing-reference-flow") {
+                referenceService = UITestIntegrationFixture.referenceService
+                return
+            }
+            #endif
             referenceService = try LocalReferenceService(bundle: .main)
         } catch {
             loadError = error.localizedDescription
         }
+    }
+
+    private var integrationTestProvider: (any AIAnswerProviding)? {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("--ui-testing-reference-flow") {
+            return UITestIntegrationFixture.Provider(
+                fail: ProcessInfo.processInfo.arguments.contains("--ui-testing-provider-failure")
+            )
+        }
+        #endif
+        return nil
     }
 }
 

@@ -70,6 +70,9 @@ rules. You can also pass a different JSON file as the first argument:
 python3 scripts/validate_reference_data.py path/to/reference_records.json
 ```
 
+Run the validator's focused tests with
+`python3 -m unittest discover -s Tests -p 'test_*.py'`.
+
 [`.github/workflows/validate-reference-data.yml`](.github/workflows/validate-reference-data.yml)
 contains the workflow definition for this validation.
 
@@ -81,6 +84,14 @@ and `RigAssistCoreTests` target. Building or running the SwiftUI app and its UI 
 requires Xcode on macOS and an iOS Simulator. The Xcode project bundles
 `data/reference_records.json` read-only; a missing or malformed resource is
 reported in the app rather than silently ignored.
+
+The Xcode UI tests include a functional Reference-to-Ask-AI flow using a
+synthetic dataset and deterministic test provider. The fixture is available
+only in debug builds when the UI tests opt in; it is not reviewed rigging
+content or evidence that the bundled records are approved. Run the
+`RigAssistAIUITests` target in Xcode on an iOS Simulator to check this flow,
+calculation-request blocking, and provider-failure fallback. A successful
+test does not replace a real provider integration or qualified-person review.
 
 ## Development workflow
 

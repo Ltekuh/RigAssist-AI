@@ -32,7 +32,10 @@ final class ReferenceAndAIServiceTests: XCTestCase {
         let service = LocalReferenceService(dataset: dataset)
 
         XCTAssertEqual(service.disclaimer, dataset.disclaimer)
-        XCTAssertTrue(service.search(query: "sling", limit: 50).isEmpty)
+        for record in dataset.records where !record.isVerified {
+            XCTAssertNil(service.record(id: record.id))
+        }
+        XCTAssertTrue(service.search(query: "sling", limit: 50).allSatisfy(\.isVerified))
     }
 
     func testReferenceSearchNormalizesQueriesAndHonorsLimit() {
@@ -271,6 +274,85 @@ final class ReferenceAndAIServiceTests: XCTestCase {
         XCTAssertTrue(response.answer.contains(approved.summary))
     }
 
+    func testFunctionalFlowSuppliesOnlyMatchingVerifiedRecordsAndReturnsCitation() async {
+        let approved = record(id: "REF-001", status: .verified, topic: "Sling angle")
+        let unverified = record(id: "REF-002", status: .unverified, topic: "Sling angle")
+        let unrelated = record(
+            id: "REF-003", status: .verified, topic: "Sling inspection",
+            tags: ["visual inspection", "damaged sling"]
+        )
+        let service = LocalReferenceService(dataset: dataset(records: [unverified, unrelated, approved]))
+        let provider = RecordingAIProvider(
+            result: .success(.init(text: approved.aiContext, citedRecordIDs: [approved.id]))
+        )
+
+        let response = await ConstrainedAIService(referenceService: service, provider: provider)
+            .ask("How does sling angle affect tension?")
+        let calls = await provider.calls
+
+        XCTAssertEqual(calls.count, 1)
+        XCTAssertEqual(calls.first?.question, "How does sling angle affect tension?")
+        XCTAssertEqual(calls.first?.records, [approved])
+        XCTAssertEqual(response.answer, approved.aiContext)
+        XCTAssertEqual(response.sources, [approved])
+        XCTAssertEqual(response.sources.first?.source, approved.source)
+        XCTAssertFalse(response.isFallback)
+    }
+
+    func testBlockedAndUnsupportedQuestionsNeverInvokeProvider() async {
+        let approved = record(id: "REF-001", status: .verified, topic: "Sling angle")
+        let provider = RecordingAIProvider(
+            result: .success(.init(text: "Unexpected", citedRecordIDs: [approved.id]))
+        )
+        let ai = ConstrainedAIService(
+            referenceService: LocalReferenceService(dataset: dataset(records: [approved])),
+            provider: provider
+        )
+
+        for question in ["Calculate sling tension for 5000 lb", "unrelated topic", " "] {
+            let response = await ai.ask(question)
+            XCTAssertTrue(response.isFallback, question)
+            XCTAssertTrue(response.sources.isEmpty, question)
+        }
+        let calls = await provider.calls
+        XCTAssertTrue(calls.isEmpty)
+    }
+
+    func testMissingOrMixedCitationsFallBackToLocalReference() async {
+        let approved = record(id: "REF-001", status: .verified, topic: "Sling angle")
+        let service = LocalReferenceService(dataset: dataset(records: [approved]))
+
+        for citations in [[], [approved.id, "REF-999"]] {
+            let ai = ConstrainedAIService(
+                referenceService: service,
+                provider: StubAIProvider(
+                    result: .success(.init(text: "Unsupported answer", citedRecordIDs: citations))
+                )
+            )
+            let response = await ai.ask("sling angle")
+            XCTAssertTrue(response.isFallback)
+            XCTAssertEqual(response.sources, [approved])
+            XCTAssertTrue(response.answer.contains(approved.summary))
+        }
+    }
+
+    func testAIRejectsUnverifiedRecordsReturnedByReferenceService() async {
+        let unverified = record(id: "REF-001", status: .unverified, topic: "Sling angle")
+        let provider = RecordingAIProvider(
+            result: .success(.init(text: "Unexpected", citedRecordIDs: [unverified.id]))
+        )
+        let ai = ConstrainedAIService(
+            referenceService: UnverifiedReferenceService(record: unverified),
+            provider: provider
+        )
+
+        let response = await ai.ask("sling angle")
+        let calls = await provider.calls
+        XCTAssertTrue(response.isFallback)
+        XCTAssertTrue(response.sources.isEmpty)
+        XCTAssertTrue(calls.isEmpty)
+    }
+
     private func dataset(records: [ReferenceRecord]) -> ReferenceDataset {
         ReferenceDataset(
             schemaVersion: "1.0",
@@ -322,4 +404,32 @@ private struct StubAIProvider: AIAnswerProviding {
     ) async throws -> AIProviderAnswer {
         try result.get()
     }
+}
+
+private actor RecordingAIProvider: AIAnswerProviding {
+    struct Call {
+        let question: String
+        let records: [ReferenceRecord]
+    }
+
+    let result: Result<AIProviderAnswer, AIProviderError>
+    private(set) var calls: [Call] = []
+
+    init(result: Result<AIProviderAnswer, AIProviderError>) {
+        self.result = result
+    }
+
+    func answer(question: String, using records: [ReferenceRecord]) async throws -> AIProviderAnswer {
+        calls.append(Call(question: question, records: records))
+        return try result.get()
+    }
+}
+
+private struct UnverifiedReferenceService: ReferenceServiceProtocol {
+    let record: ReferenceRecord
+    let disclaimer = "Test only"
+
+    func record(id: String) -> ReferenceRecord? { record }
+    func search(query: String, limit: Int) -> [ReferenceRecord] { [record] }
+    func searchForAI(query: String, limit: Int) -> [ReferenceRecord] { [record] }
 }
