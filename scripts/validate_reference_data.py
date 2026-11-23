@@ -3,6 +3,7 @@
 import json
 import re
 import sys
+from datetime import date
 
 PATH = sys.argv[1] if len(sys.argv) > 1 else "data/reference_records.json"
 CATEGORIES = {"load_angle", "sling_configuration", "capacity", "inspection", "lift_planning", "app_scope"}
@@ -78,12 +79,17 @@ for i, r in enumerate(records):
         if k not in v:
             err(f"{rid}: verification.{k} missing")
     status = v.get("status")
-    placeholder = any("TO VERIFY" in str(src.get(k, "")) for k in SOURCE_FIELDS)
+    placeholder = any("to verify" in str(src.get(k, "")).lower() for k in SOURCE_FIELDS)
     if status == "verified":
         if blank(v.get("reviewedBy")) or blank(v.get("reviewedOn")):
             err(f"{rid}: verified record needs reviewedBy and reviewedOn")
         elif not re.fullmatch(r"\d{4}-\d{2}-\d{2}", v["reviewedOn"]):
             err(f"{rid}: reviewedOn must be YYYY-MM-DD")
+        else:
+            try:
+                date.fromisoformat(v["reviewedOn"])
+            except ValueError:
+                err(f"{rid}: reviewedOn must be a valid calendar date")
         if placeholder:
             err(f"{rid}: verified record still has TO VERIFY in source")
     elif status == "unverified":

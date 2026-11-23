@@ -74,7 +74,7 @@ struct ConstrainedAIService: AIServiceProtocol {
         let sources = referenceService.searchForAI(
             query: question,
             limit: maximumSources
-        )
+        ).filter(\.isVerified)
         guard !sources.isEmpty else {
             return fallback(
                 answer: "I could not find a verified local reference for that question. "

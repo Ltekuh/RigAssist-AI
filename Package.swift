@@ -21,6 +21,7 @@ let package = Package(
                 "Design",
                 "RigAssistAIApp.swift",
                 "Services/MockCalculationEngine.swift",
+                "Services/MockReferenceService.swift",
                 "Views"
             ],
             sources: [

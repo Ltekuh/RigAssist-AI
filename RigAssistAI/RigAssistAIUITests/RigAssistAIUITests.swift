@@ -35,7 +35,7 @@ final class RigAssistAIUITests: XCTestCase {
     }
 
     @MainActor
-    func testAskAIExplainsWhenNoVerifiedReferencesExist() throws {
+    func testAskAIExplainsWhenNoVerifiedReferenceMatches() throws {
         let app = XCUIApplication()
         app.launch()
 
@@ -45,12 +45,85 @@ final class RigAssistAIUITests: XCTestCase {
             .firstMatch
         XCTAssertTrue(questionField.waitForExistence(timeout: 5))
         questionField.tap()
-        questionField.typeText("sling angle")
+        questionField.typeText("unsupported fixture zebra")
         app.buttons["Ask"].tap()
 
         let answer = app.staticTexts["assistant.answer"]
         XCTAssertTrue(answer.waitForExistence(timeout: 5))
         XCTAssertTrue(answer.label.contains("verified local reference"))
+    }
+
+    @MainActor
+    func testReferenceAndAskAIUseTheSameTestRecord() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing-reference-flow")
+        app.launch()
+
+        let weight = app.textFields["Enter weight"]
+        XCTAssertTrue(weight.waitForExistence(timeout: 5))
+        weight.tap()
+        weight.typeText("1000")
+        let capacity = app.textFields["Enter capacity"]
+        capacity.tap()
+        capacity.typeText("2000")
+        app.swipeUp()
+        app.buttons["CALCULATE"].tap()
+        XCTAssertTrue(app.staticTexts["Within Rated Capacity"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["50% capacity utilization"].exists)
+
+        app.tabBars.buttons["Reference"].tap()
+        let search = app.textFields["Search references"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        search.tap()
+        search.typeText("fixture topic")
+        XCTAssertTrue(app.staticTexts["Fixture topic alpha"].waitForExistence(timeout: 5))
+
+        app.tabBars.buttons["Ask AI"].tap()
+        ask("fixture topic", in: app)
+        let answer = app.staticTexts["assistant.answer"]
+        XCTAssertTrue(answer.waitForExistence(timeout: 5))
+        XCTAssertEqual(answer.label, "Synthetic fixture context.")
+        XCTAssertTrue(app.staticTexts["REF-900"].exists)
+        XCTAssertTrue(app.staticTexts["Synthetic test source"].exists)
+        XCTAssertTrue(app.staticTexts["UI TEST DATA ONLY. Not a rigging reference."].exists)
+    }
+
+    @MainActor
+    func testCalculationRequestIsBlockedWithTestProviderConfigured() throws {
+        let app = XCUIApplication()
+        app.launchArguments.append("--ui-testing-reference-flow")
+        app.launch()
+        app.tabBars.buttons["Ask AI"].tap()
+        ask("Calculate fixture topic tension for 5000 lb", in: app)
+        let answer = app.staticTexts["assistant.answer"]
+        XCTAssertTrue(answer.waitForExistence(timeout: 5))
+        XCTAssertTrue(answer.label.contains("deterministic Calculator"))
+        XCTAssertFalse(app.staticTexts["REF-900"].exists)
+    }
+
+    @MainActor
+    func testProviderFailureShowsCitedLocalFallback() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["--ui-testing-reference-flow", "--ui-testing-provider-failure"]
+        app.launch()
+        app.tabBars.buttons["Ask AI"].tap()
+        ask("fixture topic", in: app)
+        let answer = app.staticTexts["assistant.answer"]
+        XCTAssertTrue(answer.waitForExistence(timeout: 5))
+        XCTAssertTrue(answer.label.contains("Synthetic fixture summary."))
+        XCTAssertTrue(app.staticTexts["REF-900"].exists)
+        XCTAssertTrue(app.staticTexts["Synthetic test source"].exists)
+        XCTAssertTrue(app.staticTexts["Why this response was limited"].exists)
+    }
+
+    @MainActor
+    private func ask(_ question: String, in app: XCUIApplication) {
+        let field = app.descendants(matching: .any)
+            .matching(identifier: "assistant.question").firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText(question)
+        app.buttons["Ask"].tap()
     }
 
     @MainActor
